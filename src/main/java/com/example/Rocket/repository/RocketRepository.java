@@ -61,7 +61,6 @@ public class RocketRepository {
 
 
     public void update(Rocket rocket, Long id) {
-        // Güncellenmiş SQL sorgusu
         var updated = jdbcClient.sql("UPDATE rocket1.rocket " +
                         "SET name = ?, manufacturer = ?, height = ?, weight = ?, missionType = ?, partsCount = ? " +
                         "WHERE id = ?")

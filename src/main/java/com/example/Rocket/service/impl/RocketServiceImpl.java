@@ -41,83 +41,54 @@ public class RocketServiceImpl implements RocketService {
 
     @Override
     public RocketDto createRocket(RocketDto rocketDto) {
-        // 1. RocketDto'yu Rocket entity'sine dönüştürmek için RocketMapper kullanıyoruz
         Rocket rocket = RocketMapper.mapToRocket(rocketDto);
-
-        // 2. Rocket'i veritabanına kaydet
         rocketRepository.create(rocket);
-
-        // 3. Veritabanına eklenen Rocket'i tekrar RocketDto'ya dönüştür
         RocketDto createdRocketDto = RocketMapper.mapToRocketDto(rocket);
-
-        // 4. Oluşturulan RocketDto'yu geri döndür
         return createdRocketDto;
     }
 
     @Override
     public RocketDto getRocketById(Long rocketId) {
-        // 1. RocketRepository üzerinden id'ye göre roketi al
         Optional<Rocket> rocketOptional = rocketRepository.findById(rocketId);
-
-        // 2. Eğer roket bulunursa, Rocket'i RocketDto'ya dönüştür
         return rocketOptional
-                .map(RocketMapper::mapToRocketDto)  // Rocket'i RocketDto'ya dönüştür
-                .orElseThrow(() -> new RuntimeException("Rocket not found with id: " + rocketId));  // Eğer roket bulunmazsa hata fırlat
-
+                .map(RocketMapper::mapToRocketDto)
+                .orElseThrow(() -> new RuntimeException("Rocket not found with id: " + rocketId));
     }
 
     @Override
     public List<RocketDto> getAllRockets() {
-        // 1. RocketRepository üzerinden tüm roketleri al
         List<Rocket> rockets = rocketRepository.findAll();
-
-        // 2. Rocket listesini RocketDto listesine dönüştür
         return rockets.stream()
-                .map(RocketMapper::mapToRocketDto)  // Her Rocket nesnesini RocketDto'ya dönüştür
-                .collect(Collectors.toList());  // Listeye dönüştür
+                .map(RocketMapper::mapToRocketDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public RocketDto updateRocket(Long rocketId, RocketDto updatedRocket) {
-        // 1. RocketRepository üzerinden rocketId'ye göre mevcut roketi al
         Optional<Rocket> existingRocketOptional = rocketRepository.findById(rocketId);
-
-        // 2. Eğer roket bulunmazsa, bir hata fırlat
         Rocket existingRocket = existingRocketOptional
                 .orElseThrow(() -> new RuntimeException("Rocket not found with id: " + rocketId));
-
-        // 3. Güncellenen DTO'yu Rocket entity'sine dönüştür
         Rocket updatedRocketEntity = RocketMapper.mapToRocket(updatedRocket);
-
-        // 4. Güncellenmiş bilgileri mevcut Rocket'e aktar
         existingRocket.setName(updatedRocketEntity.getName());
         existingRocket.setManufacturer(updatedRocketEntity.getManufacturer());
         existingRocket.setHeight(updatedRocketEntity.getHeight());
         existingRocket.setWeight(updatedRocketEntity.getWeight());
         existingRocket.setMissionType(updatedRocketEntity.getMissionType());
         existingRocket.setPartsCount(updatedRocketEntity.getPartsCount());
-        //existingRocket.setVersion(existingRocket.getVersion() + 1);  // Version numarasını artırıyoruz
 
-        // 5. RocketRepository aracılığıyla veritabanında güncelleme yap (id ve version kontrolü)
-        rocketRepository.update(existingRocket, existingRocket.getId());  // `id` ile güncelleme yapılacak
+        rocketRepository.update(existingRocket, existingRocket.getId());
 
-        // 6. Güncellenen Rocket'i RocketDto'ya dönüştür
         return RocketMapper.mapToRocketDto(existingRocket);
     }
 
     @Override
     public void deleteRocket(Long rocketId) {
-        // 1. RocketRepository üzerinden rocketId'ye göre mevcut roketi al
         Optional<Rocket> existingRocketOptional = rocketRepository.findById(rocketId);
 
-        // 2. Eğer roket bulunmazsa, bir hata fırlat
         Rocket existingRocket = existingRocketOptional
                 .orElseThrow(() -> new RuntimeException("Rocket not found with id: " + rocketId));
 
-        // 3. RocketRepository aracılığıyla roketi sil
-        rocketRepository.delete(rocketId);  // Delete methodunu çağırıyoruz.
-
-        // 4. Başarılı bir şekilde silindiğinde, bilgi mesajı
+        rocketRepository.delete(rocketId);
         log.info("Rocket with id " + rocketId + " has been deleted.");
     }
 
