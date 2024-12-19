@@ -14,8 +14,11 @@ public class RocketMapper {
                 rocket.getHeight(),
                 rocket.getWeight(),
                 rocket.getMissionType(),
-                rocket.getPartsCount(),
-                rocket.getVersion());
+                rocket.getPartsCount()
+                //rocket.getVersion()
+//                rocket.getImageUrl(),
+//                rocket.getParts()
+        );
     }
     //Map RocketDto to Rocket Jpa
     public static Rocket mapToRocket(RocketDto rocketDto) {
@@ -25,7 +28,10 @@ public class RocketMapper {
                 rocketDto.getHeight(),
                 rocketDto.getWeight(),
                 rocketDto.getMissionType(),
-                rocketDto.getPartsCount(),
-                rocketDto.getVersion());
+                rocketDto.getPartsCount()
+//                rocketDto.getVersion()
+//                rocketDto.getImageUrl(),
+//                rocketDto.getParts()
+        );
     }
 }

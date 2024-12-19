@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/rocket")
@@ -49,5 +50,4 @@ public class RocketController {
         rocketService.deleteRocket(rocketId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }

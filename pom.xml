@@ -40,6 +40,23 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.14.2</version> <!-- Mockito'nun en son sürümünü kontrol edin -->
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.bytebuddy</groupId>
+			<artifactId>byte-buddy-agent</artifactId>
+			<version>1.15.10</version> <!-- Byte Buddy'nin en son sürümünü kullanın -->
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
@@ -59,9 +76,11 @@
 
 	<build>
 		<plugins>
+			<!-- Maven Compiler Plugin (Lombok için) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version>
 				<configuration>
 					<annotationProcessorPaths>
 						<path>
@@ -72,20 +91,24 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+
+			<!-- Spring Boot Maven Plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.4.0</version>
 				<configuration>
+					<!-- Lombok'u dışlamak için sadece groupId ve artifactId kullanın -->
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.36</version>
 						</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+
 
 </project>

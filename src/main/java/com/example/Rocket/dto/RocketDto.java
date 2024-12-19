@@ -2,6 +2,8 @@ package com.example.Rocket.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,6 +17,7 @@ public class RocketDto {
     private double weight;
     private String missionType;
     private int partsCount;
-    private Long version;
-
+    //private Long version;
+//    private String imageUrl;
+//    private List<String> parts;
 }
