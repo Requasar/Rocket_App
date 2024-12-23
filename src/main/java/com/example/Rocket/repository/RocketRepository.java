@@ -71,11 +71,11 @@ public class RocketRepository {
                         rocket.getWeight(),
                         rocket.getMissionType(),
                         rocket.getPartsCount(),
-                        id  // id ile güncelleme yapılacak
+                        id
                 ))
                 .update();
 
-        log.info("Update operation result: {}", updated);  // Güncelleme sonucu
+        log.info("Update operation result: {}", updated);
 
         Assert.state(updated == 1, "Failed to update rocket " + rocket.getName() + " (id: " + id + ")");
     }
