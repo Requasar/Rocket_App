@@ -41,7 +41,7 @@ const ListRocketComponent = () => {
   return (
     <div className='container'>
         <h2 className='text-center'>
-            List Rockets
+                Inventory
         </h2>
         <button className='btn btn-primary mb-2'onClick={addNewRocket}>
             Add Rocket

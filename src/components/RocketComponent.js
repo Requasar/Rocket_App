@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { createRocket, getRocket, updateRocket } from '../services/RocketService'
 import { useNavigate, useParams } from 'react-router-dom'
+import Modal from "./Modal/Modal.css";
 
 const RocketComponent = () => {
 
@@ -51,6 +52,13 @@ const RocketComponent = () => {
 
     const handlePartsCount = (event) => setPartsCount(event.target.value);
 
+    const [modalOpen, setModalOpen] = useState(false);
+
+    // for modal opeartion
+    const toggleModal = () => {
+      setModalOpen(!modalOpen);
+  };
+
 
     function saveOrUpdateRocket(e){
       e.preventDefault();
@@ -62,12 +70,13 @@ const RocketComponent = () => {
         if(id){
           updateRocket(id, rocket).then((response) => {
             console.log(response.data);
-            navigator('/rocket');
+            toggleModal();
+            setTimeout(() => navigator('/rocket'), 2500);
           })
         }else{
           createRocket(rocket).then((response) => {
             console.log(response.data);
-            navigator('/rocket');
+            setTimeout(() => navigator('/rocket'), 2500);
           }).catch(error => {
             console.error(error);
           })
@@ -93,30 +102,52 @@ const RocketComponent = () => {
         errorsCopy.manufacturer = 'Manufacturer is required';
         valid = false;
       }
-      if(height.trim()){
-        errorsCopy.height = '';
+
+      if (height.trim()) {
+        if (!/^\d+(\.\d+)?$/.test(height.trim())) { // To check if trimmed version is a valid number
+          errorsCopy.height = 'Height must be a valid number';
+          valid = false;
+        } else {
+          errorsCopy.height = ''; 
+        }
       } else {
         errorsCopy.height = 'Height is required';
         valid = false;
       }
-      if(weight.trim()){
-        errorsCopy.weight = '';
+      
+      if (weight.trim()) {
+        if (!/^\d+(\.\d+)?$/.test(weight.trim())) { // To check if trimmed version is a valid number
+          errorsCopy.weight = 'Weight must be a valid number';
+          valid = false;
+        } else {
+          errorsCopy.weight = ''; 
+        }
       } else {
         errorsCopy.weight = 'Weight is required';
         valid = false;
       }
+
+
       if(missionType.trim()){
         errorsCopy.missionType = '';
       } else {
         errorsCopy.missionType = 'Type of mission is required';
         valid = false;
       }
-      if(partsCount.trim()){
-        errorsCopy.partsCount = '';
+
+      if (partsCount.trim()) {
+        // Yalnızca tam sayı kontrolü
+        if (!/^\d+$/.test(partsCount.trim())) {
+          errorsCopy.partsCount = 'Number of part must be a valid number';
+          valid = false;
+        } else {
+          errorsCopy.partsCount = ''; // Geçerli bir tam sayı
+        }
       } else {
-        errorsCopy.partsCount = 'Number of parts is required';
+        errorsCopy.partsCount = 'Number of part is required';
         valid = false;
       }
+
       setErrors(errorsCopy);
       return valid;
     }
@@ -194,21 +225,28 @@ const RocketComponent = () => {
               </div>
 
               <div className='form-group mb-2'>
-                <label className='form-label'> missionType: </label>
-                <input
-                  type='text'
-                  placeholder='Enter Mission Type'
+                <label className='form-label'> Mission type: </label>
+                <select
                   name='missionType'
                   value={missionType}
                   className={`form-control ${errors.missionType ? 'is-invalid' : ''}`}
                   onChange={handleMissionType}
                 >
-                </input>
+                  <option value='' disabled>
+                    Select Mission Type
+                  </option>
+                  <option value='Discovery Mission'>Discovery Mission </option>
+                  <option value='Scientific Mission'>Scientific Mission</option>
+                  <option value='Cargo and Resupply Mission'>Cargo and Resupply Mission</option>
+                  <option value='Defense and Security Missions'>Defense and Security Missions</option>
+                  <option value='Communication Mission'>Communication Mission</option>
+                  <option value='Technology Demonstration Mission'>Technology Demonstration Mission</option>
+                </select>
                 {errors.missionType && <div className='invalid-feedback'>{errors.missionType}</div>} 
               </div>
 
               <div className='form-group mb-2'>
-                <label className='form-label'> partsCount: </label>
+                <label className='form-label'> Number Of Parts: </label>
                 <input
                   type='text'
                   placeholder='Enter Number of Parts'
