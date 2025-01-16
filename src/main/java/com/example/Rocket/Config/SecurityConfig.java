@@ -100,26 +100,17 @@ public class SecurityConfig{
 
     @Bean
     public SecurityFilterChain securityFilterChainUser(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
-                .cors().and().csrf().disable() // CSRF korumasını devre dışı bırak
-                .authorizeHttpRequests(registry -> {
-                    registry
-                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll(); // OPTIONS isteklerine izin ver
-                    registry
-                            .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll(); // Login ve statik kaynaklar herkese açık
-                    registry.requestMatchers(HttpMethod.GET, "/api/rocket").permitAll(); // Tüm roketleri listeleme herkese açık
-                    registry.requestMatchers(HttpMethod.POST, "/api/rocket").permitAll(); // Yeni roket ekleme izni
-                    registry.requestMatchers(HttpMethod.PUT, "/api/rocket/**").permitAll(); // Güncelleme işlemlerine izin
-                    registry.requestMatchers(HttpMethod.DELETE, "/api/rocket/**").permitAll(); // Silme işlemlerine izin
-                    registry.anyRequest().authenticated(); // Diğer her şey için doğrulama iste
-                })
-                .formLogin(httpForm -> {
-                    httpForm
-                        //    .loginPage("/login") // Login sayfası
-                            .defaultSuccessUrl("/api/rocket", true) // Başarılı giriş sonrası yönlendirme
-                            .permitAll(); // Login sayfası herkese açık
-                })
-                .build();
+        httpSecurity.authorizeHttpRequests((auth) -> auth.requestMatchers("/api/rocket/**","/auth/**").permitAll());
+        httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        httpSecurity.cors().and().csrf().disable();
+            httpSecurity.formLogin(httpForm -> {
+                httpForm
+                        //.loginPage("http://localhost:3000/auth")
+                        .defaultSuccessUrl("/api/rocket", true) // Başarılı giriş sonrası yönlendirme
+                        .permitAll(); // Login sayfası herkese açık
+            })
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            return httpSecurity.build();
     }
 
 //    @Bean

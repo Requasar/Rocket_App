@@ -1,6 +1,7 @@
 package com.example.Rocket.security;
 
 import com.example.Rocket.service.UserDetailService;
+import com.example.Rocket.service.impl.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    UserDetailService userDetailService;
+    UserDetailsServiceImpl userDetailService;
 
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -46,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String extractJwtFormRequest(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         if(StringUtils.hasText(bearer) && bearer.startsWith("Bearer "))
-            return bearer.substring("Bearer ".length()+1);
+            return bearer.substring("Bearer".length() +1);
         return null;
     }
 

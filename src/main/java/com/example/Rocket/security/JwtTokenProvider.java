@@ -19,17 +19,22 @@ public class JwtTokenProvider {
     @Value("${questapp.expires.in}")
     private long EXPIRES_IN; //token will expire in this time in seconds
 
-   // Key signingKey = Keys.hmacShaKeyFor(APP_SECRET.getBytes(StandardCharsets.UTF_8));
+   //Key signingKey = Keys.hmacShaKeyFor(APP_SECRET.getBytes(StandardCharsets.UTF_8));
 
 
-    public String generateJwtToken(Authentication auth){
-        JwtUserDetails userDetails = (JwtUserDetails) auth.getPrincipal(); //principal is the user object which we authenticate
+    public String generateJwtToken(Authentication auth) {
+        JwtUserDetails userDetails = (JwtUserDetails) auth.getPrincipal();
         Date expireDate = new Date(new Date().getTime() + EXPIRES_IN);
         return Jwts.builder().setSubject(Long.toString(userDetails.getId()))
-                .setIssuedAt(new Date())
-                .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, APP_SECRET) //Choosing an algorithm to create token, key
-                .compact();
+                .setIssuedAt(new Date()).setExpiration(expireDate)
+                .signWith(SignatureAlgorithm.HS512, APP_SECRET).compact();
+    }
+
+    public String generateJwtTokenByUserId(Long userId) {
+        Date expireDate = new Date(new Date().getTime() + EXPIRES_IN);
+        return Jwts.builder().setSubject(Long.toString(userId))
+                .setIssuedAt(new Date()).setExpiration(expireDate)
+                .signWith(SignatureAlgorithm.HS512, APP_SECRET).compact();
     }
 
     Long getUserIdFromJwt(String token){
