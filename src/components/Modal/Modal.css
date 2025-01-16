@@ -19,6 +19,21 @@
     width: 300px;
     max-width: 90%;
   }
+  /* Koyu tema için modal içeriği yazı rengini ayarlama */
+body.dark .modal-content {
+  background-color: #1e1e1e; /* Koyu tema için modal arka planını ayarladık */
+  color: #ffffff; /* Yazı rengini beyaz yaptık */
+}
+
+/* Eğer modal başlığına özel bir renk eklemek isterseniz */
+body.dark .modal-content h2 {
+  color: #ffffff; /* Koyu tema için başlık yazısını beyaz yapıyoruz */
+}
+
+/* Koyu tema için modalın kapatma butonunu da uyumlu yapmak */
+body.dark .close {
+  color: #ffffff; /* Koyu temada kapama butonunu beyaz yapıyoruz */
+}
   /* Close button */
   .close {
     position: absolute;
@@ -27,4 +42,3 @@
     font-size: 24px;
     cursor: pointer;
   }
-  
