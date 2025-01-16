@@ -4,6 +4,8 @@ import com.example.Rocket.dto.UserDto;
 import com.example.Rocket.entity.User;
 import com.example.Rocket.mapper.UserMapper;
 import com.example.Rocket.repository.UserRepository;
+import com.example.Rocket.security.JwtUserDetails;
+import com.example.Rocket.service.UserDetailService;
 import com.example.Rocket.service.UserService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -22,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Service //spring container to create a spring bean for UserServiceImpl class
 @AllArgsConstructor //constructor with all arguments
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailService {
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -38,6 +40,17 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        return JwtUserDetails.create(user);
+    }
+
+    public UserDetails loadUserById(Long id){
+        User user = userRepository.findById(id).get();
+        return JwtUserDetails.create(user);
+    }
 
 //    public PasswordEncoder passwordEncoder() {
 //        return new BCryptPasswordEncoder();
@@ -67,16 +80,16 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + userUsername));
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
-        );
-    }
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        User user = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+//        return new org.springframework.security.core.userdetails.User(
+//                user.getUsername(),
+//                user.getPassword(),
+//                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
+//        );
+//    }
 
     @Override
     public List<UserDto> getAllUsers() {

@@ -3,52 +3,33 @@ package com.example.Rocket.Config;
 
 import com.example.Rocket.security.JwtAuthenticationEntryPoint;
 import com.example.Rocket.security.JwtAuthenticationFilter;
-import com.example.Rocket.service.impl.UserDetailsServiceImpl;
 import com.example.Rocket.service.impl.UserServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.BeanIds;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import javax.sql.DataSource;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig{
 
-    private UserDetailsServiceImpl userDetailsService;
+    private UserServiceImpl userDetailsService;
 
     private JwtAuthenticationEntryPoint handler;
 
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthenticationEntryPoint handler) {
+    public SecurityConfig(UserServiceImpl userDetailsService, JwtAuthenticationEntryPoint handler) {
         this.userDetailsService = userDetailsService;
         this.handler = handler;
     }
@@ -60,6 +41,7 @@ public class SecurityConfig{
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        System.out.println("Authenticate method triggered");
         return authenticationConfiguration.getAuthenticationManager();
     }
 
@@ -72,25 +54,26 @@ public class SecurityConfig{
 //    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
 //        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 //    }
+//
+//    @Bean
+//    public AuthenticationProvider authenticationProvider() {
+//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+//        provider.setUserDetailsService((UserDetailsService) userDetailsService);
+//        provider.setPasswordEncoder(passwordEncoder());
+//        return provider;
+//    }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService((UserDetailsService) userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
-
-    @Bean
-    public CorsFilter corsFilter(){
+    public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
+        config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("OPTIONS");
         config.addAllowedMethod("HEAD");
         config.addAllowedMethod("GET");
+        config.addAllowedMethod("PUT");
         config.addAllowedMethod("POST");
         config.addAllowedMethod("DELETE");
         config.addAllowedMethod("PATCH");
@@ -99,17 +82,17 @@ public class SecurityConfig{
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChainUser(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests((auth) -> auth.requestMatchers("/api/rocket/**","/auth/**").permitAll());
-        httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors().and().csrf().disable();
+        httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        httpSecurity.authorizeHttpRequests((auth) -> auth.requestMatchers("/api/rocket/**","/auth/**").permitAll());
             httpSecurity.formLogin(httpForm -> {
                 httpForm
                         //.loginPage("http://localhost:3000/auth")
                         .defaultSuccessUrl("/api/rocket", true) // Başarılı giriş sonrası yönlendirme
                         .permitAll(); // Login sayfası herkese açık
-            })
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            });
+            httpSecurity.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
             return httpSecurity.build();
     }
 
