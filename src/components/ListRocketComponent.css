@@ -1,0 +1,110 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.light {
+    background-color: #ffffff; 
+    color: #000000;
+}
+
+body.dark {
+    background-color: #121212; 
+    color: #ffffff;
+}
+
+.container {
+    padding: 20px;
+}
+
+.table {
+    background-color: transparent; 
+    color: inherit; 
+    transition: background-color 0.3s, color 0.3s;
+    border-color: #333333; 
+}
+
+.table thead {
+    background-color: rgba(0, 0, 0, 0.1); 
+    color: inherit; 
+}
+
+body.dark .table thead {
+    background-color: rgba(255, 255, 255, 0.1); 
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.05); 
+}
+
+body.dark .table tbody tr:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.05); 
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.1); 
+}
+
+body.dark .table tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.1); 
+}
+
+input.form-control {
+    background-color: rgba(0, 0, 0, 0.05); 
+    color: inherit; 
+    border: 1px solid #cccccc;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+body.dark input.form-control {
+    background-color: rgba(255, 255, 255, 0.829); 
+    border-color: #000000;
+}
+
+input.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+button {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+button.btn-primary {
+    background-color: #007bff;
+    border-color: #0056b3;
+}
+
+button.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+button.btn-secondary {
+    background-color: #6c757d;
+    margin-right: 10px;
+    margin-top: 10px;
+    border-color: #5a6268;
+}
+
+button.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+button.btn-info {
+    background-color: #17a2b8;
+    border-color: #117a8b;
+}
+
+button.btn-info:hover {
+    background-color: #117a8b;
+}
+
+button.btn-danger {
+    background-color: #dc3545;
+    border-color: #b02a37;
+}
+
+button.btn-danger:hover {
+    background-color: #b02a37;
+}
