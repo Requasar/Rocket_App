@@ -4,6 +4,7 @@ import com.example.Rocket.dto.UserDto;
 import com.example.Rocket.entity.User;
 import com.example.Rocket.mapper.UserMapper;
 import com.example.Rocket.repository.UserRepository;
+import com.example.Rocket.security.JwtTokenProvider;
 import com.example.Rocket.security.JwtUserDetails;
 import com.example.Rocket.service.UserDetailService;
 import com.example.Rocket.service.UserService;
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService, UserDetailService {
 
     private final UserRepository userRepository;
  //   private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -37,6 +39,21 @@ public class UserServiceImpl implements UserService, UserDetailService {
         userRepository.create(user);
         UserDto createdUserDto = UserMapper.mapToUserDto(user);
         return createdUserDto;
+    }
+
+    @Override
+    public String authenticateUser(String username, String password) throws Exception {
+        // Fetch user from database
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new Exception("User not found"));
+
+        // Validate password (hash comparison might be needed)
+        if (!user.getPassword().equals(password)) { // Consider using password hashing
+            throw new Exception("Invalid credentials");
+        }
+
+        // Generate JWT token
+        return jwtTokenProvider.generateJwtTokenByUserId(user.getId());
     }
 
 

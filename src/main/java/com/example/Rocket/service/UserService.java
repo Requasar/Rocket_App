@@ -17,5 +17,7 @@ public interface UserService extends UserDetailsService {
 
     UserDto updateUser(Long userId, UserDto updatedUser);
 
+    String authenticateUser(String username, String password) throws Exception;
+
     void deleteUser(Long userId);
 }

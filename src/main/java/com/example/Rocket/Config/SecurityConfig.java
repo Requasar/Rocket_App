@@ -4,14 +4,21 @@ package com.example.Rocket.Config;
 import com.example.Rocket.security.JwtAuthenticationEntryPoint;
 import com.example.Rocket.security.JwtAuthenticationFilter;
 import com.example.Rocket.service.impl.UserServiceImpl;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.MacAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -19,36 +26,43 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig{
 
-    private UserServiceImpl userDetailsService;
+//    private UserServiceImpl userDetailsService;
+//
+//    private JwtAuthenticationEntryPoint handler;
+//
+//    public SecurityConfig(UserServiceImpl userDetailsService, JwtAuthenticationEntryPoint handler) {
+//        this.userDetailsService = userDetailsService;
+//        this.handler = handler;
+//    }
 
-    private JwtAuthenticationEntryPoint handler;
+//    @Bean
+//    public JwtDecoder jwtDecoder() {
+//        var secretKey = new SecretKeySpec(jwtSecretKey.getBytes(), "");
+//        return NimbusJwtDecoder.withSecretKey(secretKey)
+//                .macAlgorithm(MacAlgorithm.HS256).build();
+//    }
 
-    public SecurityConfig(UserServiceImpl userDetailsService, JwtAuthenticationEntryPoint handler) {
-        this.userDetailsService = userDetailsService;
-        this.handler = handler;
-    }
-
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        System.out.println("Authenticate method triggered");
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+//    @Bean
+//    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+//        return new JwtAuthenticationFilter();
+//    }
+//
+//    @Bean
+//    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+//        System.out.println("Authenticate method triggered");
+//        return authenticationConfiguration.getAuthenticationManager();
+//    }
+//
 
 //    @Override
 //    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -63,38 +77,56 @@ public class SecurityConfig{
 //        return provider;
 //    }
 
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("OPTIONS");
-        config.addAllowedMethod("HEAD");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("PATCH");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
+//    @Bean
+//    public CorsFilter corsFilter() {
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowCredentials(true);
+//        config.addAllowedOrigin("*");
+//        config.addAllowedHeader("*");
+//        config.addAllowedMethod("OPTIONS");
+//        config.addAllowedMethod("HEAD");
+//        config.addAllowedMethod("GET");
+//        config.addAllowedMethod("PUT");
+//        config.addAllowedMethod("POST");
+//        config.addAllowedMethod("DELETE");
+//        config.addAllowedMethod("PATCH");
+//        source.registerCorsConfiguration("/**", config);
+//        return new CorsFilter(source);
+//    }
+//
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        return http
+//                .csrf(csrf -> csrf.disable())
+//                .authorizeHttpRequests(auth ->auth
+//                        .requestMatchers("/").permitAll()
+//                        .requestMatchers("/api/rocket/**").permitAll()
+//                        .requestMatchers("/auth/**").permitAll()
+//                        .requestMatchers("/auth/login").permitAll()
+//                        .requestMatchers("/auth/register").permitAll()
+//                        .requestMatchers("/api/user/").permitAll()
+//                        .anyRequest().authenticated())
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .build();
+//
+//    }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.cors().and().csrf().disable();
-        httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        httpSecurity.authorizeHttpRequests((auth) -> auth.requestMatchers("/api/rocket/**","/auth/**").permitAll());
-            httpSecurity.formLogin(httpForm -> {
-                httpForm
-                        //.loginPage("http://localhost:3000/auth")
-                        .defaultSuccessUrl("/api/rocket", true) // Başarılı giriş sonrası yönlendirme
-                        .permitAll(); // Login sayfası herkese açık
-            });
-            httpSecurity.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-            return httpSecurity.build();
-    }
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+//        httpSecurity.cors().and().csrf().disable();
+//        httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//        httpSecurity.authorizeHttpRequests((auth) -> auth.requestMatchers("/api/rocket/**","/auth/**").permitAll());
+//            httpSecurity.formLogin(httpForm -> {
+//                httpForm
+//                        //.loginPage("http://localhost:3000/auth")
+//                        .defaultSuccessUrl("/api/rocket", true) // Başarılı giriş sonrası yönlendirme
+//                        .permitAll(); // Login sayfası herkese açık
+//            });
+//            httpSecurity.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+//            return httpSecurity.build();
+//    }
 
 //    @Bean
 //    public WebMvcConfigurer corsConfigurer() {
@@ -149,23 +181,25 @@ public class SecurityConfig{
 //    @Bean
 //    public SecurityFilterChain securityFilterChainUser(HttpSecurity httpSecurity) throws Exception {
 //        return httpSecurity
-//                .cors().and().csrf().disable() // CSRF korumasını devre dışı bırak
+//                .cors().and().csrf().disable()
 //                .authorizeHttpRequests(registry -> {
 //                    registry
 //                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll(); // OPTIONS isteklerine izin ver
 //                    registry
-//                            .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll(); // Login ve statik kaynaklar herkese açık
-//                    registry.requestMatchers(HttpMethod.GET, "/api/rocket").permitAll(); // Tüm roketleri listeleme herkese açık
-//                    registry.requestMatchers(HttpMethod.POST, "/api/rocket").permitAll(); // Yeni roket ekleme izni
-//                    registry.requestMatchers(HttpMethod.PUT, "/api/rocket/**").permitAll(); // Güncelleme işlemlerine izin
-//                    registry.requestMatchers(HttpMethod.DELETE, "/api/rocket/**").permitAll(); // Silme işlemlerine izin
-//                    registry.anyRequest().authenticated(); // Diğer her şey için doğrulama iste
+//                            .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll();
+//                    registry.requestMatchers(HttpMethod.GET, "/api/rocket").permitAll();
+//                    registry.requestMatchers(HttpMethod.POST, "/api/rocket").permitAll();
+//                    registry.requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll();
+//                    registry.requestMatchers(HttpMethod.GET, "/api/auth/**").permitAll();
+//                    registry.requestMatchers(HttpMethod.PUT, "/api/rocket/**").permitAll();
+//                    registry.requestMatchers(HttpMethod.DELETE, "/api/rocket/**").permitAll();
+//                    registry.anyRequest().authenticated();
 //                })
 //                .formLogin(httpForm -> {
 //                    httpForm
-//                        //    .loginPage("/login") // Login sayfası
-//                            .defaultSuccessUrl("/api/rocket", true) // Başarılı giriş sonrası yönlendirme
-//                            .permitAll(); // Login sayfası herkese açık
+////                            .loginPage("/api/auth/login")
+//                            .defaultSuccessUrl("/api/rocket", true)
+//                            .permitAll();
 //                })
 //                .build();
 //    }
@@ -197,18 +231,50 @@ public class SecurityConfig{
 //        return new BCryptPasswordEncoder();  // BCrypt algorithm for password encoding
 //    }
 //
-//    @Bean
-//    public WebMvcConfigurer corsConfigurer() {
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/**")
-//                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-//                        .allowedOrigins("http://localhost:3000") // Frontend adresiniz
-//                        .allowedHeaders("*");
-//            }
-//        };
+
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http.csrf().disable()  // CSRF'yi devre dışı bırakıyoruz
+//                .authorizeRequests()
+//                .dispatcherTypeMatchers("/api/auth/login").permitAll()  // Login API'ye izin ver
+//                .anyRequest().authenticated();  // Diğer tüm isteklere kimlik doğrulama zorunlu
 //    }
+
+//    @Configuration
+//    @EnableWebSecurity
+//    public class SecurityConfig extends WebSecurityConfigurerAdapter {
+//        @Override
+//        protected void configure(HttpSecurity http) throws Exception {
+//            http.csrf().disable();
+//        }
+//    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+
+    @Value("${FRONTEND_URL}")
+    private String fUrl;
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins(fUrl,"/**")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*");
+                        //.allowCredentials(true);
+            }
+        };
+    }
 //
 //    @Bean
 //    public JdbcUserDetailsManager jdbcUserDetailsManager() {

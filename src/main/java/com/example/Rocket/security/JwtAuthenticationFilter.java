@@ -16,13 +16,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
     @Autowired
     JwtTokenProvider jwtTokenProvider;
-
     @Autowired
     UserServiceImpl userDetailService;
-
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try{
@@ -41,12 +38,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
-
     private String extractJwtFormRequest(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         if(StringUtils.hasText(bearer) && bearer.startsWith("Bearer "))
             return bearer.substring("Bearer".length() +1);
         return null;
     }
-
 }

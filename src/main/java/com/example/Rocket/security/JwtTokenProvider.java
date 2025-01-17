@@ -14,46 +14,31 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
     @Value("${questapp.app.secret}")
-    private String APP_SECRET; //we will crate our token with this secret, key
+    private String APP_SECRET;
 
     @Value("${questapp.expires.in}")
-    private long EXPIRES_IN; //token will expire in this time in seconds
+    private long EXPIRES_IN;
 
-   //Key signingKey = Keys.hmacShaKeyFor(APP_SECRET.getBytes(StandardCharsets.UTF_8));
-
-
-    public String generateJwtToken(Authentication auth) {
-        JwtUserDetails userDetails = (JwtUserDetails) auth.getPrincipal();
-        Date expireDate = new Date(new Date().getTime() + EXPIRES_IN);
-        return Jwts.builder().setSubject(Long.toString(userDetails.getId()))
-                .setIssuedAt(new Date()).setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, APP_SECRET).compact();
+    public String generateJwtTokenByUserId(Long userId) {
+        Date expireDate = new Date(new Date().getTime() + EXPIRES_IN * 1000); // EXPIRES_IN'i saniyeden milisaniyeye çeviriyoruz
+        return Jwts.builder()
+                .setSubject(Long.toString(userId))
+                .setIssuedAt(new Date())
+                .setExpiration(expireDate)
+                .signWith(SignatureAlgorithm.HS512, APP_SECRET)
+                .compact();
     }
 
-//    public String generateJwtTokenByUserId(Long userId) {
-//        Date expireDate = new Date(new Date().getTime() + EXPIRES_IN);
-//        return Jwts.builder().setSubject(Long.toString(userId))
-//                .setIssuedAt(new Date()).setExpiration(expireDate)
-//                .signWith(SignatureAlgorithm.HS512, APP_SECRET).compact();
-//    }
-
-    Long getUserIdFromJwt(String token){
-        Claims claims = Jwts.parser().setSigningKey(APP_SECRET).build().parseClaimsJws(token).getBody(); //parse the token and get the body
-        return Long.parseLong(claims.getSubject()); //we parse the subject to long and return it
+    public Long getUserIdFromJwt(String token) {
+        Claims claims = Jwts.parser().setSigningKey(APP_SECRET).build().parseClaimsJws(token).getBody();
+        return Long.parseLong(claims.getSubject());
     }
 
-    boolean validateToken(String token) {
+    public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(APP_SECRET).build().parseClaimsJws(token); // if we can parse the token, it is valid because we created it
+            Jwts.parser().setSigningKey(APP_SECRET).build().parseClaimsJws(token);
             return !isTokenExpired(token);
-        } catch (MalformedJwtException e) {
-            System.out.println("Invalid JWT token");
-            return false;
-        } catch (UnsupportedJwtException e) {
-            System.out.println("Unsupported JWT token");
-            return false;
-        } catch (IllegalArgumentException e) {
-            System.out.println("JWT claims string is empty.");
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }

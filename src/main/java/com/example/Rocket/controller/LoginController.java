@@ -1,21 +1,42 @@
 package com.example.Rocket.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-@CrossOrigin(origins = "http://localhost:3000") // Frontend adresinizi buraya yazın
-@Controller
+import com.example.Rocket.dto.UserDto;
+import com.example.Rocket.requests.UserRequest;
+import com.example.Rocket.responses.AuthResponse;
+import com.example.Rocket.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
 public class LoginController {
 
-    @PostMapping("/loginnnnn") // Frontend'in gönderdiği username ve password'u almak için
-    @ResponseBody
-    public String login(@RequestParam String username, @RequestParam String password) {
-        // Spring Security, doğrulamayı otomatik olarak yapacak.
-        // Bu yöntem sadece frontend ile iletişimi sağlar.
-        System.out.println("Username: " + username + ", Password: " + password);
-        return "Login attempt received. Check Spring Security for authentication.";
+    private final UserService userService;
+
+    private UserRequest userRequest;
+
+    @Autowired
+    public LoginController(UserService userService) {
+        this.userService = userService;
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody UserRequest userRequest) {
+        try {
+            System.out.println("Authenticate method triggered");
+
+            String token = userService.authenticateUser(userRequest.getUserName(), userRequest.getPassword());
+
+            return ResponseEntity.ok("Login successful");
+
+        } catch (Exception e) {
+            // Hata durumunda ilgili mesaj döndürülür
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
 }
