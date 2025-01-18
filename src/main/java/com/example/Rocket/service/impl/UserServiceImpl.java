@@ -6,16 +6,14 @@ import com.example.Rocket.mapper.UserMapper;
 import com.example.Rocket.repository.UserRepository;
 import com.example.Rocket.security.JwtTokenProvider;
 import com.example.Rocket.security.JwtUserDetails;
-import com.example.Rocket.service.UserDetailService;
 import com.example.Rocket.service.UserService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +23,12 @@ import java.util.stream.Collectors;
 
 @Service //spring container to create a spring bean for UserServiceImpl class
 @AllArgsConstructor //constructor with all arguments
-public class UserServiceImpl implements UserService, UserDetailService {
+public class UserServiceImpl implements UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
  //   private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -41,28 +38,13 @@ public class UserServiceImpl implements UserService, UserDetailService {
         return createdUserDto;
     }
 
-    @Override
-    public String authenticateUser(String username, String password) throws Exception {
-        // Fetch user from database
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new Exception("User not found"));
 
-        // Validate password (hash comparison might be needed)
-        if (!user.getPassword().equals(password)) { // Consider using password hashing
-            throw new Exception("Invalid credentials");
-        }
-
-        // Generate JWT token
-        return jwtTokenProvider.generateJwtTokenByUserId(user.getId());
-    }
-
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-        return JwtUserDetails.create(user);
-    }
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        User user = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+//        return JwtUserDetails.create(user);
+//    }
 
     public UserDetails loadUserById(Long id){
         User user = userRepository.findById(id).get();
@@ -130,6 +112,27 @@ public class UserServiceImpl implements UserService, UserDetailService {
 
         return UserMapper.mapToUserDto(existingUser);
     }
+
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Override
+    public String authenticateUser(String username, String password) throws Exception {
+        // Fetch user from database
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found!!!"));
+
+        // Validate password
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new BadCredentialsException("Invalid credentials");
+        }
+
+        // Generate JWT token
+        return jwtTokenProvider.generateJwtTokenByUserId(user.getId());
+    }
+
 
     @Override
     public void deleteUser(Long userId) {

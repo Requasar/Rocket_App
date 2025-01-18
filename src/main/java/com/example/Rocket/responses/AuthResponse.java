@@ -9,7 +9,7 @@ public class AuthResponse {
     private String token;
 
     // Full constructor
-    public AuthResponse(String message, Long userId, String token) {
+    public AuthResponse() {
         this.message = message;
         this.userId = userId;
         this.token = token;

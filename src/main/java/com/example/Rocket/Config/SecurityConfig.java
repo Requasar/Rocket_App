@@ -6,6 +6,7 @@ import com.example.Rocket.security.JwtAuthenticationFilter;
 import com.example.Rocket.service.impl.UserServiceImpl;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.MacAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -181,7 +183,7 @@ public class SecurityConfig{
 //    @Bean
 //    public SecurityFilterChain securityFilterChainUser(HttpSecurity httpSecurity) throws Exception {
 //        return httpSecurity
-//                .cors().and().csrf().disable()
+//                .csrf(customizer ->customizer.disable())
 //                .authorizeHttpRequests(registry -> {
 //                    registry
 //                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll(); // OPTIONS isteklerine izin ver
@@ -250,6 +252,34 @@ public class SecurityConfig{
 //    }
 
     @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+        http.csrf(customizer ->customizer.disable());
+        http.authorizeHttpRequests(registry -> {
+                    registry
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                            .requestMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/auth/**").permitAll()
+                            .requestMatchers("/auth/**").permitAll();});
+        http.authorizeHttpRequests(request ->request.anyRequest().authenticated());
+        http.formLogin(Customizer.withDefaults());
+        http.httpBasic(Customizer.withDefaults());
+        http.sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+
+        return http.build();
+    }
+    @Autowired
+    private UserDetailsService UserDetailsService;
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(UserDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -259,22 +289,24 @@ public class SecurityConfig{
     }
 
 
-    @Value("${FRONTEND_URL}")
-    private String fUrl;
+//    @Value("${FRONTEND_URL}")
+//    private String fUrl;
+//
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/**")
+//                        .allowedOrigins("http://192.168.1.41:3000", "http://192.168.1.41:8080",fUrl,"http:/localhost:3000")  // iki farklı origin
+//                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//                        .allowedHeaders("*")
+//                        .allowCredentials(true);
+//            }
+//        };
+//    }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins(fUrl,"/**")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*");
-                        //.allowCredentials(true);
-            }
-        };
-    }
+
 //
 //    @Bean
 //    public JdbcUserDetailsManager jdbcUserDetailsManager() {
