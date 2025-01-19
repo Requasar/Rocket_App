@@ -3,6 +3,7 @@ package com.example.Rocket.Config;
 
 import com.example.Rocket.security.JwtAuthenticationEntryPoint;
 import com.example.Rocket.security.JwtAuthenticationFilter;
+import com.example.Rocket.security.JwtTokenProvider;
 import com.example.Rocket.service.impl.UserServiceImpl;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.MacAlgorithm;
@@ -251,6 +252,18 @@ public class SecurityConfig{
 //        }
 //    }
 
+    private final JwtTokenProvider jwtTokenProvider;
+
+    // Constructor Injection
+    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtTokenProvider);
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf(customizer ->customizer.disable());
@@ -264,6 +277,7 @@ public class SecurityConfig{
         http.formLogin(Customizer.withDefaults());
         http.httpBasic(Customizer.withDefaults());
         http.sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();

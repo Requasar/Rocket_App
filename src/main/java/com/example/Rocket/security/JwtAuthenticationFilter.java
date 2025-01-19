@@ -17,29 +17,42 @@ import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    JwtTokenProvider jwtTokenProvider;
+//    @Autowired
+//    JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     UserDetailsServiceImpl userDetailService;
+
+    private final JwtTokenProvider jwtTokenProvider;
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
             String jwtToken = extractJwtFromRequest(request);
-            if(StringUtils.hasText(jwtToken) && jwtTokenProvider.validateToken(jwtToken)) {
+            System.out.println("Extracted JWT Tokennn: " + jwtToken);
+
+            if (StringUtils.hasText(jwtToken) && jwtTokenProvider.validateToken(jwtToken)) {
+                System.out.println("Token is validddddddddddddddd");
                 Long id = jwtTokenProvider.getUserIdFromJwt(jwtToken);
                 UserDetails user = userDetailService.loadUserById(id);
-                if(user != null) {
+                if (user != null) {
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
+                } else {
+                    // Log if user is not found
+                    logger.warn("User not found with ID: " + id);
                 }
             }
-        } catch(Exception e) {
-            return;
+        } catch (Exception e) {
+            // Log the exception
+            logger.error("JWT authentication failed: ", e);
         }
+
         filterChain.doFilter(request, response);
     }
 

@@ -53,12 +53,19 @@ public class JwtTokenProvider {
     }
 
     Long getUserIdFromJwt(String token){
-        Claims claims = Jwts.parser().setSigningKey(APP_SECRET).build().parseClaimsJws(token).getBody(); //parse the token and get the body
+        Claims claims = Jwts.parser().setSigningKey(signingKey).build().parseClaimsJws(token).getBody(); //parse the token and get the body
         return Long.parseLong(claims.getSubject()); //we parse the subject to long and return it
     }
     boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(APP_SECRET).build().parseClaimsJws(token); // if we can parse the token, it is valid because we created it
+            System.out.println("Starting token validation: " + token);
+            Jws<Claims> claimsJws = Jwts.parser()
+                    .setSigningKey(signingKey)
+                    .build()
+                    .parseClaimsJws(token);
+
+            // Parsed Claims'i yazdır
+            System.out.println("Parsed Claims: " + claimsJws.getBody());
             return !isTokenExpired(token);
         } catch (MalformedJwtException e) {
             System.out.println("Invalid JWT token");
@@ -73,7 +80,7 @@ public class JwtTokenProvider {
     }
 
     private boolean isTokenExpired(String token) {
-        Date expiration = Jwts.parser().setSigningKey(APP_SECRET).build().parseClaimsJws(token).getBody().getExpiration();
+        Date expiration = Jwts.parser().setSigningKey(signingKey).build().parseClaimsJws(token).getBody().getExpiration();
         return expiration.before(new Date());
     }
 }
