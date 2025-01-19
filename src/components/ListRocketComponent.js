@@ -1,19 +1,23 @@
-import React, { useEffect, useState } from 'react'
-import { deleteRocket, listRocket } from '../services/RocketService'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { deleteRocket, listRocket } from '../services/RocketService';
+import { useNavigate } from 'react-router-dom';
 import './ListRocketComponent.css';
 
 const ListRocketComponent = () => {
-
-    const [rocket, setRocket] = useState([]) // state to store the rockets we can pass the initial values with useState hook
+    const [rocket, setRocket] = useState([]); // state to store the rockets we can pass the initial values with useState hook
     const [searchTerm, setSearchTerm] = useState(""); // state to store the search term
     const [theme, setTheme] = useState("dark");
 
     const navigator = useNavigate();
 
     useEffect(() => {
-        getAllRockets(); //we call the function to get all rockets
-    }, [])
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigator('/login'); 
+        } else {
+            getAllRockets(); 
+        }
+    }, []);
 
     useEffect(() => {
         document.body.className = theme;
@@ -28,8 +32,7 @@ const ListRocketComponent = () => {
     }
 
     function addNewRocket() {
-        navigator('/rocket/add-rocket'); //Navigate hook to navigate to the add-rocket page, new page So when button clicked function calls this part and 
-                                  //We went into new page which is /add-rocket
+        navigator('/rocket/add-rocket'); //Navigate hook to navigate to the add-rocket page
     }
 
     function updateRocket(id) {
@@ -77,7 +80,7 @@ const ListRocketComponent = () => {
             </div>
 
             <table className='table table-striped table-bordered'>
-                <thead> {/* table columns*/}
+                <thead>
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
@@ -91,7 +94,7 @@ const ListRocketComponent = () => {
                 </thead>
                 <tbody>
                     {
-                        filteredRockets.map((rocket, index) => (
+                        filteredRockets.map((rocket) => (
                             <tr key={rocket.id}>
                                 <td>{rocket.id}</td>
                                 <td>{rocket.name}</td>
