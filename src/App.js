@@ -17,7 +17,7 @@ function App() {
       <HeaderComponent /> {/* Those bottom 3 are constant we should encapsule them with browserRouter*/}
         <Routes> {/*container are a parent for all the integer in routes*/}
            {/* Login  */}
-           <Route path='/auth' element={<LoginForm />} />
+           <Route path='/auth' element={<Login />} />
             {/* http://localhost:3000/ */}
             {/*<Route path='/' element={<ListRocketComponent/>}></Route>*/}
             {/* http://localhost:3000/rocket */} {/* At this adress ListRocket Component will work or activated with path we make our adress after main adress*/}

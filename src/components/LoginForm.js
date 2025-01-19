@@ -34,8 +34,6 @@ function LoginForm() {
   
   }
 
-
-
   const handleLogin = () => {
     sendRequest("login")
     setUsername("")
