@@ -33,10 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             String jwtToken = extractJwtFromRequest(request);
-            System.out.println("Extracted JWT Tokennn: " + jwtToken);
-
             if (StringUtils.hasText(jwtToken) && jwtTokenProvider.validateToken(jwtToken)) {
-                System.out.println("Token is validddddddddddddddd");
                 Long id = jwtTokenProvider.getUserIdFromJwt(jwtToken);
                 UserDetails user = userDetailService.loadUserById(id);
                 if (user != null) {
@@ -44,18 +41,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 } else {
-                    // Log if user is not found
                     logger.warn("User not found with ID: " + id);
                 }
             }
         } catch (Exception e) {
-            // Log the exception
             logger.error("JWT authentication failed: ", e);
         }
 
         filterChain.doFilter(request, response);
     }
-
     private String extractJwtFromRequest(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         if(StringUtils.hasText(bearer) && bearer.startsWith("Bearer "))

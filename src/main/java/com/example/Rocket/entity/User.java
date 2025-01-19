@@ -12,7 +12,7 @@ import java.util.List;
 public class User {
 
     private Long id;
-    private String username; // Kullanıcı adı veya e-posta (benzersiz olmalı)
-    private String password; // Şifre (hashed bir şekilde tutulmalı!)
-    private String role; // Kullanıcı rolü (ADMIN, USER, vb.)
+    private String username;
+    private String password;
+    private String role;
 }

@@ -46,7 +46,6 @@ public class AuthController {
     @PostMapping("/login")
     public AuthResponse login(@RequestBody UserRequest loginRequest) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword());
-        System.out.println("Username: " + loginRequest.getUserName());
         Authentication auth = authenticationManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(auth);
         String jwtToken = jwtTokenProvider.generateJwtToken(auth);
@@ -55,20 +54,22 @@ public class AuthController {
         authResponse.setMessage("User logged in successfully");
         authResponse.setUserId(user.getId());
         authResponse.setToken(jwtToken);
+        authResponse.setRole(user.getRole());
         return authResponse;
     }
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody UserRequest registerRequest){
-        AuthResponse authResponse = new AuthResponse();
-        if(userDetailService.loadUserByUsername(registerRequest.getUserName()) != null) {
-            authResponse.setMessage("Username already exists");
-            return new ResponseEntity<>(authResponse, HttpStatus.BAD_REQUEST);
-        }
-        UserDto userDto = new UserDto();
-        userDto.setUsername(registerRequest.getUserName());
-        userDto.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        userService.createUser(userDto);
-        authResponse.setMessage("User registered successfully");
-        return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
-    }
+
+//    @PostMapping("/register")
+//    public ResponseEntity<AuthResponse> register(@RequestBody UserRequest registerRequest){
+//        AuthResponse authResponse = new AuthResponse();
+//        if(userDetailService.loadUserByUsername(registerRequest.getUserName()) != null) {
+//            authResponse.setMessage("Username already exists");
+//            return new ResponseEntity<>(authResponse, HttpStatus.BAD_REQUEST);
+//        }
+//        UserDto userDto = new UserDto();
+//        userDto.setUsername(registerRequest.getUserName());
+//        userDto.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+//        userService.createUser(userDto);
+//        authResponse.setMessage("User registered successfully");
+//        return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
+//    }
 }

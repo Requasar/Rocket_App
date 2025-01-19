@@ -25,7 +25,7 @@ public class UserController {
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
-    // Get Rocket Rest API endpoint
+    // Get User Rest API endpoint
     @GetMapping("id/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable("id") Long userId) {
         UserDto user= userService.getUserById(userId);
@@ -41,21 +41,21 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    // Build Get All Rockets REST API endpoint
+    // Build Get All Users REST API endpoint
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);//Maybe new can be change
     }
 
-    //Build Update Rocket REST API endpoint
+    //Build Update User REST API endpoint
     @PutMapping("{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable("id") Long userId, @RequestBody UserDto updatedUser) {
         UserDto user = userService.updateUser(userId, updatedUser);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    //Build Delete Rocket REST API endpoint
+    //Build Delete User REST API endpoint
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long userId) {
         userService.deleteUser(userId);

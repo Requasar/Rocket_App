@@ -34,7 +34,7 @@ public class RocketController {
     @GetMapping
     public ResponseEntity<List<RocketDto>> getAllRockets() {
         List<RocketDto> rockets = rocketService.getAllRockets();
-        return new ResponseEntity<>(rockets, HttpStatus.OK);//Maybe new can be change
+        return new ResponseEntity<>(rockets, HttpStatus.OK);
     }
 
     //Build Update Rocket REST API endpoint

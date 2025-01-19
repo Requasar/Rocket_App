@@ -26,9 +26,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
-
     private final UserRepository userRepository;
- //   private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -50,18 +48,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id).get();
         return JwtUserDetails.create(user);
     }
-
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-
-//    @Override
-//    public UserDto createUser(UserDto userDto) {
-//        User user = UserMapper.mapToUser(userDto);
-//        user.setPassword(passwordEncoder.encode(user.getPassword())); // Şifreyi burada encode et
-//        userRepository.create(user);
-//        return UserMapper.mapToUserDto(user);
-//    }
 
     @Override
     public UserDto getUserById(Long userId) {
@@ -120,16 +106,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String authenticateUser(String username, String password) throws Exception {
-        // Fetch user from database
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found!!!"));
 
-        // Validate password
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("Invalid credentials");
         }
-
-        // Generate JWT token
         return jwtTokenProvider.generateJwtTokenByUserId(user.getId());
     }
 

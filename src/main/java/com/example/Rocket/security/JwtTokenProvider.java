@@ -28,15 +28,10 @@ public class JwtTokenProvider {
         if (APP_SECRET == null || APP_SECRET.isEmpty()) {
             throw new IllegalArgumentException("APP_SECRET cannot be null or empty");
         }
-        System.out.println("APP_SECRET: " + APP_SECRET);
         signingKey = Keys.hmacShaKeyFor(APP_SECRET.getBytes(StandardCharsets.UTF_8));
-
     }
-
     public String generateJwtToken(Authentication auth) {
         JwtUserDetails userDetails = (JwtUserDetails) auth.getPrincipal();
-        System.out.println("User Details: " + userDetails); // Debug
-        System.out.println("Signing Key123: " + signingKey);
         Date expireDate = new Date(new Date().getTime() + EXPIRES_IN);
         return Jwts.builder().setSubject(Long.toString(userDetails.getId()))
                 .setIssuedAt(new Date()).setExpiration(expireDate)
@@ -44,7 +39,6 @@ public class JwtTokenProvider {
                 .compact();
 
     }
-
     public String generateJwtTokenByUserId(Long userId) {
         Date expireDate = new Date(new Date().getTime() + EXPIRES_IN);
         return Jwts.builder().setSubject(Long.toString(userId))
@@ -58,14 +52,10 @@ public class JwtTokenProvider {
     }
     boolean validateToken(String token) {
         try {
-            System.out.println("Starting token validation: " + token);
             Jws<Claims> claimsJws = Jwts.parser()
                     .setSigningKey(signingKey)
                     .build()
                     .parseClaimsJws(token);
-
-            // Parsed Claims'i yazdır
-            System.out.println("Parsed Claims: " + claimsJws.getBody());
             return !isTokenExpired(token);
         } catch (MalformedJwtException e) {
             System.out.println("Invalid JWT token");
@@ -78,7 +68,6 @@ public class JwtTokenProvider {
             return false;
         }
     }
-
     private boolean isTokenExpired(String token) {
         Date expiration = Jwts.parser().setSigningKey(signingKey).build().parseClaimsJws(token).getBody().getExpiration();
         return expiration.before(new Date());

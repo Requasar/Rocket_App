@@ -7,12 +7,14 @@ public class AuthResponse {
     private String message;
     private Long userId;
     private String token;
+    private String role;
 
     // Full constructor
     public AuthResponse() {
         this.message = message;
         this.userId = userId;
         this.token = token;
+        this.role = role;
     }
 
     // Constructor for token only
@@ -20,4 +22,3 @@ public class AuthResponse {
         this.token = token;
     }
 }
-

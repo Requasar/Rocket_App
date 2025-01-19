@@ -13,10 +13,10 @@ public class Rocket {
     private Long id;
     private String name;
     private String manufacturer;
-    private double height;
-    private double weight;
+    private String height;
+    private String weight;
     private String missionType;
-    private int partsCount;
+    private String partsCount;
  //   private Long version;
 //    private String imageUrl;
 //    private List<String> parts;
